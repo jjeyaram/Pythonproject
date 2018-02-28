@@ -9,4 +9,4 @@ class platform:
 
 
     def render (self, window):
-         pygame.draw.rect(window,(0,0,0),(self.x,self.y, self.width, self.height))
+         pygame.draw.rect(window,(225,225,225),(self.x,self.y, self.width, self.height))

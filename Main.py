@@ -28,7 +28,7 @@ Level = [
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+[1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -48,21 +48,31 @@ for y in range(0,len(Level)):
         if(Level[y][x]==1):
             blocklist.append(platform(x*32,y*32))
 
-
-
+#this is whats added to the players.x value
+Xposition= 0
 #loops as long as game loop is true
 GameIsRunning = True
 while GameIsRunning:
     for event in pygame.event.get():
-        if (event.type==pygame.QUIT):
+        if (event.type == pygame.QUIT):
             GameIsRunning = False
+        keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+            player.x += -5
+            print("left")
+    if keys[pygame.K_RIGHT]:
+            player.x += 5
+            print("right")
+    player.x += Xposition
     #simple background color
     window.fill(Red)
     #calling this will take the values from blocklist and create a rectangle in that position
-    for block in blocklist:
-        block.render(window)
+    for platform in blocklist:
+        platform.render(window)
+    #movement using the Xposition vlaues
+
     #gravity so the player is always falling down
-    player.update(gravity, blocklist)
+    player.update(gravity, blocklist,)
     #renders what is in the window,this case its the player rect with the position(x,y) and (W,H)
     player.render(window)
     #setting the fps

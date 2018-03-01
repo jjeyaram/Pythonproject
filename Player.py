@@ -11,6 +11,11 @@ class Player:
         self.falling = True
         self.onGround = False
 
+    def jump(self):
+        if(self.onGround == True):
+            self.velocity= 10
+            self.onGround== False
+
     collision = False
      #collision detection checks, this is comparing the corners of the player and the platform
     def detectCollisions(self, x1, y1, w1, h1, x2, y2, w2, h2):

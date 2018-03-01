@@ -63,6 +63,8 @@ while GameIsRunning:
     if keys[pygame.K_RIGHT]:
             player.x += 5
             print("right")
+    if keys[pygame.K_UP]:
+            player.y += -10
     player.x += Xposition
     #simple background color
     window.fill(Red)

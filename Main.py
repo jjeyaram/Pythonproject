@@ -1,3 +1,10 @@
+try:
+    import simplegui
+
+except ImportError:
+
+    import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
+
 import pygame
 from Player import *
 from Platform import *
@@ -76,6 +83,7 @@ while GameIsRunning:
     #gravity so the player is always falling down
     player.update(gravity, blocklist,)
     #renders what is in the window,this case its the player rect with the position(x,y) and (W,H)
+
     player.render(window)
     #setting the fps
     clock.tick(60)

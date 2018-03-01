@@ -1,4 +1,10 @@
 import pygame
+try:
+    import simplegui
+
+except ImportError:
+
+    import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
 
 class platform:
     def __init__(self,x ,y):

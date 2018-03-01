@@ -1,4 +1,11 @@
 import pygame
+try:
+    import simplegui
+
+except ImportError:
+
+    import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
+
 from Platform import *
 class Player:
 
@@ -11,6 +18,7 @@ class Player:
         self.falling = True
         self.onGround = False
 
+        self.image = pygame.image.load("character.png")
     def jump(self):
         if(self.onGround == True):
             self.velocity= 10
@@ -74,4 +82,5 @@ class Player:
 
         self.y -= self.velocity
     def render(self, window):
-        pygame.draw.rect(window,(0,0,0),(self.x,self.y,self.width,self.height))
+        #pygame.draw.rect(window, (0, 0, 0), (self.x, self.y, self.width, self.height))
+        window.blit(self.image,(self.x,self.y,self.width,self.height))

@@ -1,0 +1,53 @@
+#imports
+import simplegui
+import math
+import random
+
+# Global Variables
+canvas_width = 800
+canvas_height = 600
+pos1 = [50,50]
+xposition = 100 
+yposition = 100
+gravity = -10
+#loading the player image
+Player_image = simplegui.load_image("https://i.stack.imgur.com/Tgpak.png")
+
+#player class 
+class image:
+    def __init__(self, center,image, image_center, image_size):
+        self.center = center
+        self.image = image
+        self.image_center = image_center
+        self.image_size = image_size 
+    def get_center(self):
+        return self.center
+    def get_image(self):
+        return self.image
+    def get_image_center(self):
+        return self.image_center
+    def get_image_size(self):
+        return self.image_size
+    
+    #drawing the player 
+    def draw(self, canvas):
+        canvas.draw_image(self.image, self.image_center, self.image_size, self.center,pos1)
+
+image = image([xposition,yposition], Player_image, [389.5,301], [779, 602])
+
+        
+#event 
+def draw(canvas):
+    image.draw(canvas)
+    
+  
+#frame
+frame = simplegui.create_frame("Balance", canvas_width, canvas_height) 
+
+#setting the event handler
+frame.set_draw_handler(draw)
+#frame.set_keydown_handler(keydown_handler)
+frame.set_canvas_background("Red")
+
+# Start
+frame.start()

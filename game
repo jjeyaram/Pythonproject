@@ -1,53 +1,105 @@
-#imports
+from user301_hPMHbpw1h9_0 import Vector
 import simplegui
-import math
-import random
 
-# Global Variables
-canvas_width = 800
-canvas_height = 600
-pos1 = [50,50]
-xposition = 100 
-yposition = 100
-gravity = -10
-#loading the player image
-Player_image = simplegui.load_image("https://i.stack.imgur.com/Tgpak.png")
+CANVAS_DIMS = (600, 400)
 
-#player class 
-class image:
-    def __init__(self, center,image, image_center, image_size):
-        self.center = center
-        self.image = image
-        self.image_center = image_center
-        self.image_size = image_size 
-    def get_center(self):
-        return self.center
-    def get_image(self):
-        return self.image
-    def get_image_center(self):
-        return self.image_center
-    def get_image_size(self):
-        return self.image_size
-    
-    #drawing the player 
+WIDTH = 500
+HEIGHT = 500
+class Player:
+    def __init__(self, pos, radius=5):
+        self.pos = pos
+        self.vel = Vector()
+        self.radius = max(radius, 5)
+        self.colour = 'White'
+
     def draw(self, canvas):
-        canvas.draw_image(self.image, self.image_center, self.image_size, self.center,pos1)
+        if(self.pos.x - self.radius >(WIDTH)):
+            self.pos.x = WIDTH-self.radius
+            canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')    
+        elif(self.pos.x + self.radius <(0)):
+            self.pos.x = 0
+            canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')    
+        if(self.pos.y - self.radius > HEIGHT):
+            self.pos.y = 0-self.radius
+            canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')    
+        elif(self.pos.y + self.radius <(0)):
+            self.pos.y = WIDTH + self.radius
+            canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')
 
-image = image([xposition,yposition], Player_image, [389.5,301], [779, 602])
+        canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')
 
-        
-#event 
-def draw(canvas):
-    image.draw(canvas)
+    def update(self):
+        self.pos.add(self.vel)
+        self.vel.multiply(0.85)
     
-  
-#frame
-frame = simplegui.create_frame("Balance", canvas_width, canvas_height) 
+class Keyboard:
+    def __init__(self):
+        self.right = False
+        self.left = False
+        self.up = False
+        self.down = False
 
-#setting the event handler
+    def keyDown(self, key):
+        if (key == simplegui.KEY_MAP['right']):
+            self.right = True
+            #special
+            if (key == simplegui.KEY_MAP['left']):
+                self.left = False
+                self.right = True
+
+        elif (key == simplegui.KEY_MAP['left']):
+            self.left = True
+            if (key == simplegui.KEY_MAP['right']):
+                self.right = False
+                self.left = True
+
+        elif key == simplegui.KEY_MAP['up']:
+            self.up = True
+
+        elif key == simplegui.KEY_MAP['down']:
+                self.down = True
+
+    def keyUp(self, key):
+        if key == simplegui.KEY_MAP['right']:
+            self.right = False
+
+        elif key == simplegui.KEY_MAP['left']:
+            self.left = False
+
+        elif key == simplegui.KEY_MAP['up']:
+            self.up = False
+
+        elif key == simplegui.KEY_MAP['down']:
+            self.down = False
+
+class Interaction:
+    def __init__(self, wheel, keyboard):
+        self.wheel = wheel
+        self.keyboard = keyboard
+
+    def update(self):
+        if self.keyboard.right:
+            self.wheel.vel.add(Vector(1, 0))
+        if self.keyboard.left:
+            self.wheel.vel.add(Vector(-1, 0))
+        if self.keyboard.up:
+            self.wheel.vel.add(Vector(0,-1))
+        if self.keyboard.down:
+            self.wheel.vel.add(Vector(0,1))
+
+
+kbd = Keyboard()
+player = Player(Vector(WIDTH/2, HEIGHT-40))
+inter = Interaction(player, kbd)
+
+def draw(canvas):
+    inter.update()
+    player.update()
+    player.draw(canvas)
+
+frame = simplegui.create_frame('Interactions', WIDTH, HEIGHT)
+frame.set_canvas_background('#2C6A6A')
 frame.set_draw_handler(draw)
-#frame.set_keydown_handler(keydown_handler)
-frame.set_canvas_background("Red")
-
-# Start
+frame.set_keydown_handler(kbd.keyDown)
+frame.set_keyup_handler(kbd.keyUp)
 frame.start()

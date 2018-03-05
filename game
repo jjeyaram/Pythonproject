@@ -2,7 +2,7 @@ from user301_hPMHbpw1h9_0 import Vector
 import simplegui
 
 CANVAS_DIMS = (600, 400)
-
+GRAVITY = 7
 WIDTH = 500
 HEIGHT = 500
 class Player:
@@ -11,6 +11,7 @@ class Player:
         self.vel = Vector()
         self.radius = max(radius, 10)
         self.colour = 'White'
+        self.graivty = GRAVITY
 
     def draw(self, canvas):
         if(self.pos.x - self.radius>(450)):
@@ -32,6 +33,7 @@ class Player:
     def update(self):
         self.pos.add(self.vel)
         self.vel.multiply(0.85)
+    
     
 class Keyboard:
     def __init__(self):
@@ -72,21 +74,24 @@ class Keyboard:
 
         elif key == simplegui.KEY_MAP['down']:
             self.down = False
-
+            
 class Interaction:
-    def __init__(self, wheel, keyboard):
-        self.wheel = wheel
+    def __init__(self, ball, keyboard):
+        self.ball = ball
         self.keyboard = keyboard
 
     def update(self):
         if self.keyboard.right:
-            self.wheel.vel.add(Vector(1, 0))
+            self.ball.vel.add(Vector(1, 0))
         if self.keyboard.left:
-            self.wheel.vel.add(Vector(-1, 0))
+            self.ball.vel.add(Vector(-1, 0))
         if self.keyboard.up:
-            self.wheel.vel.add(Vector(0,-1))
+            self.ball.vel.add(Vector(0,-1))
+        else:
+                self.ball.pos.y+=GRAVITY
         if self.keyboard.down:
-            self.wheel.vel.add(Vector(0,1))
+            self.ball.vel.add(Vector(0,1))
+            
 
 
 kbd = Keyboard()

@@ -34,7 +34,15 @@ class Player:
         self.pos.add(self.vel)
         self.vel.multiply(0.85)
     
+
+class Platform:
+    def __init__(self,point1,point2):
+        self.pA = point1
+        self.pB = point2 
     
+    def draw(self,canvas):
+        canvas.draw_line(self.pA.getP(),self.pB.getP(),1,"red")
+       
 class Keyboard:
     def __init__(self):
         self.right = False
@@ -76,9 +84,10 @@ class Keyboard:
             self.space = False
             
 class Interaction:
-    def __init__(self, ball, keyboard):
+    def __init__(self, ball, keyboard, block):
         self.ball = ball
         self.keyboard = keyboard
+        self.block = block
 
     def update(self):
         if self.keyboard.right:
@@ -89,21 +98,24 @@ class Interaction:
             self.ball.vel.add(Vector(0,-1))
         if self.keyboard.space:
             self.ball.vel.add(Vector(0,-3.5))
+            print(self.ball.pos.y)
         else:
                 self.ball.pos.y+=GRAVITY
-        
-            
+       
 
 
 kbd = Keyboard()
 player = Player(Vector(WIDTH/2, HEIGHT-40))
-inter = Interaction(player, kbd)
-
+inter = Interaction(player, kbd, Platform)
+platform = Platform(Vector(100,100),Vector(200,200))
+              
+            
 def draw(canvas):
     inter.update()
     player.update()
-    player.draw(canvas)
-
+    player.draw(canvas) 
+    platform.draw(canvas)
+    
 frame = simplegui.create_frame('Interactions', WIDTH, HEIGHT)
 frame.set_canvas_background('#2C6A6A')
 frame.set_draw_handler(draw)

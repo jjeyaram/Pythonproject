@@ -14,15 +14,15 @@ class Player:
         self.graivty = GRAVITY
 
     def draw(self, canvas):
-        if(self.pos.x - self.radius>(450)):
-            self.pos.x = 470-self.radius
+        if(self.pos.x - self.radius>(WIDTH-50)):
+            self.pos.x = (WIDTH-30)-self.radius
             canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')  
             print(self.pos.getP)
         elif(self.pos.x + self.radius <(50)):
             self.pos.x = 30 +self.radius
             canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')    
-        if(self.pos.y - self.radius > 450):
-            self.pos.y = 470-self.radius
+        if(self.pos.y - self.radius > WIDTH-50):
+            self.pos.y = (WIDTH-30)-self.radius
             canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')    
         elif(self.pos.y + self.radius <(0)):
             self.pos.y = WIDTH + self.radius
@@ -40,7 +40,7 @@ class Keyboard:
         self.right = False
         self.left = False
         self.up = False
-        self.down = False
+        self.space = False
 
     def keyDown(self, key):
         if (key == simplegui.KEY_MAP['right']):
@@ -56,11 +56,11 @@ class Keyboard:
                 self.right = False
                 self.left = True
 
-        elif key == simplegui.KEY_MAP['up']:
+        elif key == simplegui.KEY_MAP['z']:
             self.up = True
 
-        elif key == simplegui.KEY_MAP['down']:
-                self.down = True
+        elif key == simplegui.KEY_MAP['space']:
+                self.space = True
 
     def keyUp(self, key):
         if key == simplegui.KEY_MAP['right']:
@@ -69,11 +69,11 @@ class Keyboard:
         elif key == simplegui.KEY_MAP['left']:
             self.left = False
 
-        elif key == simplegui.KEY_MAP['up']:
+        elif key == simplegui.KEY_MAP['z']:
             self.up = False
 
-        elif key == simplegui.KEY_MAP['down']:
-            self.down = False
+        elif key == simplegui.KEY_MAP['space']:
+            self.space = False
             
 class Interaction:
     def __init__(self, ball, keyboard):
@@ -87,10 +87,11 @@ class Interaction:
             self.ball.vel.add(Vector(-1, 0))
         if self.keyboard.up:
             self.ball.vel.add(Vector(0,-1))
+        if self.keyboard.space:
+            self.ball.vel.add(Vector(0,-3.5))
         else:
                 self.ball.pos.y+=GRAVITY
-        if self.keyboard.down:
-            self.ball.vel.add(Vector(0,1))
+        
             
 
 

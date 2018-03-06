@@ -5,6 +5,14 @@ CANVAS_DIMS = (600, 400)
 GRAVITY = 7
 WIDTH = 500
 HEIGHT = 500
+def rotAnti(self):
+    aux = self.copy()
+    self.x = -aux.y
+    self.y = aux.y 
+    return self
+def getProj(self,normal):
+    n = normal.copy()
+    return n.mult(self.dot(n))
 class Player:
     def __init__(self, pos, radius=10):
         self.pos = pos
@@ -39,10 +47,24 @@ class Platform:
     def __init__(self,point1,point2):
         self.pA = point1
         self.pB = point2 
+        #computing the normal line 
+        #self.unit = self.pB.copy().sub(self.pA).normalise()
+        #normal = self.unit.copy().rotAnti()
+        
     
+    def distanceVector(self,pos):
+        posToA = pos.copy().sub(self.pA)
+        return posToA.getProj(self.normal)
+    
+    def distance(self,player):
+        return self.distanceVector(player).length()
+        
     def draw(self,canvas):
         canvas.draw_line(self.pA.getP(),self.pB.getP(),1,"red")
-       
+
+        
+        
+        
 class Keyboard:
     def __init__(self):
         self.right = False

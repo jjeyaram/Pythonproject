@@ -1,8 +1,8 @@
-from user301_hPMHbpw1h9_0 import Vector
+rom user301_hPMHbpw1h9_0 import Vector
 import simplegui
 
 CANVAS_DIMS = (600, 400)
-GRAVITY = 7
+GRAVITY = -0.5
 WIDTH = 500
 HEIGHT = 500
 def rotAnti(self):
@@ -119,7 +119,7 @@ class Interaction:
         if self.keyboard.up:
             self.ball.vel.add(Vector(0,-1))
         if self.keyboard.space:
-            self.ball.vel.add(Vector(0,-3.5))
+            self.ball.vel.add(Vector(0,-2))
             print(self.ball.pos.y)
         else:
                 self.ball.pos.y+=GRAVITY

@@ -4,7 +4,7 @@ import random
     
 WIDTH = 500
 HEIGHT = 500
-GRAVITY = 10
+GRAVITY = 2
 BALL_RADUIUS = 10
 def rotateAnti(v):
     return Vector(-v.y, v.x)
@@ -123,12 +123,12 @@ class Interaction:
         if self.keyboard.left:
             self.player.vel.add(Vector(-1, 0))
         if self.keyboard.up:
-            self.player.vel.add(Vector(0,-1))
+            self.player.vel.add(Vector(0,0))
         if self.keyboard.space:
-            self.player.vel.add(Vector(0,-2))
+            self.player.vel.add(Vector(0,-0.5))
         else:
             self.inCollision = False 
-            self.player.vel.add(Vector(0,2))
+            self.player.vel.add(Vector(0,0.5))
         if (self.line.distanceTo(self.player.pos) < self.line.thickness + self.player.radius and
             self.line.covers(self.player.pos)):
             if not self.inCollision:
@@ -141,13 +141,17 @@ kbd = Keyboard()
 p = Player(Vector(0,0),Vector(0,0))
 
 l = Line(Vector(0, 100),Vector(50,100))
+l2 = Line(Vector(0, 300),Vector(300,300))
 i = Interaction(p,kbd, l)
+i2 = Interaction(p,kbd, l2)
 
 def draw(canvas):
     p.draw(canvas)
     l.draw(canvas)
+    l2.draw(canvas)
     p.update()
     i.update()
+    i2.update()
 frame = simplegui.create_frame('Game', WIDTH, HEIGHT)
 frame.set_draw_handler(draw)
 frame.set_keydown_handler(kbd.keyDown)

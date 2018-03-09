@@ -4,39 +4,40 @@ import random
     
 WIDTH = 500
 HEIGHT = 500
-GRAVITY = 1
+GRAVITY = 10
+BALL_RADUIUS = 10
 def rotateAnti(v):
     return Vector(-v.y, v.x)
 
-class Particle:
+class Player:
     def __init__(self, pos, vel):
         self.pos = pos
         self.vel = vel
-        self.radius = 10
+        self.radius = BALL_RADUIUS 
         
     def draw(self, canvas):
         self.pos = pos
         self.vel = Vector()
-        self.radius = max(radius, 10)
+        self.radius = max(radius, BALL_RADUIUS)
         self.colour = 'White'
         self.graivty = GRAVITY
 
     def draw(self, canvas):
         if(self.pos.x - self.radius>(WIDTH-50)):
             self.pos.x = (WIDTH-30)-self.radius
-            canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')  
+            canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')  
             print(self.pos.getP)
         elif(self.pos.x + self.radius <(50)):
             self.pos.x = 30 +self.radius
-            canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')    
+            canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')    
         if(self.pos.y - self.radius > WIDTH-50):
             self.pos.y = (WIDTH-30)-self.radius
-            canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')    
+            canvas.draw_circle(self.pos.getP(),BALL_RADUIUS , BALL_RADUIUS, 'White', 'White')    
         elif(self.pos.y + self.radius <(0)):
             self.pos.y = WIDTH + self.radius
-            canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')
+            canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')
 
-        canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')
+        canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')
 
         
     def bounce(self, normal):
@@ -111,39 +112,36 @@ class Keyboard:
             self.space = False
             
 class Interaction:
-    def __init__(self, particle,keyboard, line):
-        self.particle = particle
+    def __init__(self, player,keyboard, line):
+        self.player = player
         self.keyboard = keyboard
         self.line = line
         self.inCollision = False
 
     def update(self):
         if self.keyboard.right:
-             self.particle.vel.add(Vector(1, 0))
+             self.player.vel.add(Vector(1, 0))
         if self.keyboard.left:
-            self.particle.vel.add(Vector(-1, 0))
+            self.player.vel.add(Vector(-1, 0))
         if self.keyboard.up:
-            self.particle.vel.add(Vector(0,-1))
+            self.player.vel.add(Vector(0,-1))
         if self.keyboard.space:
-            self.particle.vel.add(Vector(0,-2))
-            print(self.particle.pos.y)
+            self.player.vel.add(Vector(0,-2))
         else:
-                self.particle.pos.y+=GRAVITY
-        if (self.line.distanceTo(self.particle.pos) < self.line.thickness + self.particle.radius and
-            self.line.covers(self.particle.pos)):
+            self.inCollision = False 
+            self.player.vel.add(Vector(0,2))
+        if (self.line.distanceTo(self.player.pos) < self.line.thickness + self.player.radius and
+            self.line.covers(self.player.pos)):
             if not self.inCollision:
-                self.particle.bounce(self.line.normal)
+                self.player.bounce(self.line.normal)
                 self.inCollision = True
         else:
             self.inCollision = False
 
 kbd = Keyboard()
-p = Particle(Vector(100, 100),
-             Vector(random.randint(0, 3), random.randint(0, 3)))
+p = Player(Vector(WIDTH/2,470),Vector(0,0))
 
-l = Line(Vector(random.randint(0, WIDTH), random.randint(0, HEIGHT)),
-         Vector(random.randint(0, WIDTH), random.randint(0, HEIGHT)))
-
+l = Line(Vector(0, 250),Vector(600,200))
 i = Interaction(p,kbd, l)
 
 def draw(canvas):
@@ -151,8 +149,7 @@ def draw(canvas):
     l.draw(canvas)
     p.update()
     i.update()
-
-frame = simplegui.create_frame('Particle-line collision', WIDTH, HEIGHT)
+frame = simplegui.create_frame('Game', WIDTH, HEIGHT)
 frame.set_draw_handler(draw)
 frame.set_keydown_handler(kbd.keyDown)
 frame.set_keyup_handler(kbd.keyUp)

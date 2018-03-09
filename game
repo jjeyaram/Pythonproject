@@ -1,20 +1,20 @@
-rom user301_hPMHbpw1h9_0 import Vector
+from user301_aNmKzZ2bht_0 import Vector
 import simplegui
-
-CANVAS_DIMS = (600, 400)
-GRAVITY = -0.5
+import random
+    
 WIDTH = 500
 HEIGHT = 500
-def rotAnti(self):
-    aux = self.copy()
-    self.x = -aux.y
-    self.y = aux.y 
-    return self
-def getProj(self,normal):
-    n = normal.copy()
-    return n.mult(self.dot(n))
-class Player:
-    def __init__(self, pos, radius=10):
+GRAVITY = 1
+def rotateAnti(v):
+    return Vector(-v.y, v.x)
+
+class Particle:
+    def __init__(self, pos, vel):
+        self.pos = pos
+        self.vel = vel
+        self.radius = 10
+        
+    def draw(self, canvas):
         self.pos = pos
         self.vel = Vector()
         self.radius = max(radius, 10)
@@ -38,33 +38,38 @@ class Player:
 
         canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')
 
+        
+    def bounce(self, normal):
+        self.vel.reflect(normal)
+        
     def update(self):
         self.pos.add(self.vel)
         self.vel.multiply(0.85)
-    
+        self.wrap()
 
-class Platform:
-    def __init__(self,point1,point2):
+    def wrap(self):
+        self.pos.x %= WIDTH
+        self.pos.y %= HEIGHT
+
+class Line:
+    def __init__(self, point1, point2):
         self.pA = point1
-        self.pB = point2 
-        #computing the normal line 
-        #self.unit = self.pB.copy().sub(self.pA).normalise()
-        #normal = self.unit.copy().rotAnti()
+        self.pB = point2
+        self.thickness = 3
+        self.unit = (self.pB - self.pA).normalize()
+        self.normal = rotateAnti(self.unit)
         
-    
-    def distanceVector(self,pos):
-        posToA = pos.copy().sub(self.pA)
-        return posToA.getProj(self.normal)
-    
-    def distance(self,player):
-        return self.distanceVector(player).length()
+    def draw(self, canvas):
+        canvas.draw_line(self.pA.getP(), self.pB.getP(), self.thickness, "White")
         
-    def draw(self,canvas):
-        canvas.draw_line(self.pA.getP(),self.pB.getP(),1,"red")
+    def distanceTo(self, pos):
+        posToA = pos - self.pA
+        proj = posToA.dot(self.normal) * self.normal
+        return proj.length()
 
-        
-        
-        
+    def covers(self, pos):
+        return ((pos - self.pA).dot(self.unit) >= 0 and
+                (pos - self.pB).dot(-self.unit) >= 0)
 class Keyboard:
     def __init__(self):
         self.right = False
@@ -106,40 +111,48 @@ class Keyboard:
             self.space = False
             
 class Interaction:
-    def __init__(self, ball, keyboard, block):
-        self.ball = ball
+    def __init__(self, particle,keyboard, line):
+        self.particle = particle
         self.keyboard = keyboard
-        self.block = block
+        self.line = line
+        self.inCollision = False
 
     def update(self):
         if self.keyboard.right:
-            self.ball.vel.add(Vector(1, 0))
+             self.particle.vel.add(Vector(1, 0))
         if self.keyboard.left:
-            self.ball.vel.add(Vector(-1, 0))
+            self.particle.vel.add(Vector(-1, 0))
         if self.keyboard.up:
-            self.ball.vel.add(Vector(0,-1))
+            self.particle.vel.add(Vector(0,-1))
         if self.keyboard.space:
-            self.ball.vel.add(Vector(0,-2))
-            print(self.ball.pos.y)
+            self.particle.vel.add(Vector(0,-2))
+            print(self.particle.pos.y)
         else:
-                self.ball.pos.y+=GRAVITY
-       
-
+                self.particle.pos.y+=GRAVITY
+        if (self.line.distanceTo(self.particle.pos) < self.line.thickness + self.particle.radius and
+            self.line.covers(self.particle.pos)):
+            if not self.inCollision:
+                self.particle.bounce(self.line.normal)
+                self.inCollision = True
+        else:
+            self.inCollision = False
 
 kbd = Keyboard()
-player = Player(Vector(WIDTH/2, HEIGHT-40))
-inter = Interaction(player, kbd, Platform)
-platform = Platform(Vector(100,100),Vector(200,200))
-              
-            
+p = Particle(Vector(100, 100),
+             Vector(random.randint(0, 3), random.randint(0, 3)))
+
+l = Line(Vector(random.randint(0, WIDTH), random.randint(0, HEIGHT)),
+         Vector(random.randint(0, WIDTH), random.randint(0, HEIGHT)))
+
+i = Interaction(p,kbd, l)
+
 def draw(canvas):
-    inter.update()
-    player.update()
-    player.draw(canvas) 
-    platform.draw(canvas)
-    
-frame = simplegui.create_frame('Interactions', WIDTH, HEIGHT)
-frame.set_canvas_background('#2C6A6A')
+    p.draw(canvas)
+    l.draw(canvas)
+    p.update()
+    i.update()
+
+frame = simplegui.create_frame('Particle-line collision', WIDTH, HEIGHT)
 frame.set_draw_handler(draw)
 frame.set_keydown_handler(kbd.keyDown)
 frame.set_keyup_handler(kbd.keyUp)

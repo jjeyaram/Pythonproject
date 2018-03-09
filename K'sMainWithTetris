@@ -1,4 +1,5 @@
 # main code
+# it doesn't pop up in the same canvas
 from user301_hPMHbpw1h9_0 import Vector
 import simplegui
 import random

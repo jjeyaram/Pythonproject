@@ -26,15 +26,14 @@ class Player:
         if(self.pos.x - self.radius>(WIDTH-50)):
             self.pos.x = (WIDTH-30)-self.radius
             canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')  
-            print(self.pos.getP)
-        elif(self.pos.x + self.radius <(50)):
+        if(self.pos.x + self.radius <(50)):
             self.pos.x = 30 +self.radius
             canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')    
         if(self.pos.y - self.radius > WIDTH-50):
             self.pos.y = (WIDTH-30)-self.radius
             canvas.draw_circle(self.pos.getP(),BALL_RADUIUS , BALL_RADUIUS, 'White', 'White')    
-        elif(self.pos.y + self.radius <(0)):
-            self.pos.y = WIDTH + self.radius
+        if(self.pos.y  < 50):
+            self.pos.y = 60
             canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')
 
         canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')
@@ -139,9 +138,9 @@ class Interaction:
             self.inCollision = False
 
 kbd = Keyboard()
-p = Player(Vector(WIDTH/2,470),Vector(0,0))
+p = Player(Vector(0,0),Vector(0,0))
 
-l = Line(Vector(0, 250),Vector(600,200))
+l = Line(Vector(0, 100),Vector(50,100))
 i = Interaction(p,kbd, l)
 
 def draw(canvas):
@@ -154,3 +153,4 @@ frame.set_draw_handler(draw)
 frame.set_keydown_handler(kbd.keyDown)
 frame.set_keyup_handler(kbd.keyUp)
 frame.start()
+        

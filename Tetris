@@ -8,7 +8,7 @@ start_level = 0
 #setting up the gui stuff
 width = 10
 height = 22
-block_size = 20
+block_size = 40
 WIDTH = 500
 HEIGHT = 500
 frame_width = 16

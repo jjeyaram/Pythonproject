@@ -23,20 +23,20 @@ class Player:
         self.graivty = GRAVITY
 
     def draw(self, canvas):
-        if(self.pos.x - self.radius>(WIDTH-50)):
-            self.pos.x = (WIDTH-30)-self.radius
-            canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')  
-        if(self.pos.x + self.radius <(50)):
-            self.pos.x = 30 +self.radius
-            canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')    
-        if(self.pos.y - self.radius > WIDTH-50):
-            self.pos.y = (WIDTH-30)-self.radius
-            canvas.draw_circle(self.pos.getP(),BALL_RADUIUS , BALL_RADUIUS, 'White', 'White')    
-        if(self.pos.y  < 50):
-            self.pos.y = 60
-            canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')
+        #if(self.pos.x - self.radius>(WIDTH-50)):
+         #   self.pos.x = (WIDTH-30)-self.radius
+          #  canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')  
+        #if(self.pos.x + self.radius <(50)):
+        #    self.pos.x = 30 +self.radius
+         #   canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')    
+        #if(self.pos.y - self.radius > WIDTH-50):
+         #   self.pos.y = (WIDTH-30)-self.radius
+        #    canvas.draw_circle(self.pos.getP(),BALL_RADUIUS , BALL_RADUIUS, 'White', 'White')    
+       # if(self.pos.y  < 50):
+       #     self.pos.y = 60
+       #     canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')
 
-        canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')
+       canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')
 
         
     def bounce(self, normal):
@@ -139,22 +139,28 @@ class Interaction:
 
 kbd = Keyboard()
 p = Player(Vector(0,0),Vector(0,0))
-
-l = Line(Vector(0, 100),Vector(50,100))
-l2 = Line(Vector(0, 300),Vector(300,300))
-i = Interaction(p,kbd, l)
-i2 = Interaction(p,kbd, l2)
-
+#top
+top = Line(Vector(0, 0),Vector(500,0))
+bottom= Line(Vector(0, WIDTH),Vector(500,500))
+right = Line(Vector(500, 0),Vector(500,500))
+left= Line(Vector(0, 0),Vector(0,500))
+i = Interaction(p,kbd, top)
+i2 = Interaction(p,kbd, bottom)
+i3 = Interaction(p,kbd, right)
+i4 = Interaction(p,kbd, left)
 def draw(canvas):
     p.draw(canvas)
-    l.draw(canvas)
-    l2.draw(canvas)
+    top.draw(canvas)
+    bottom.draw(canvas)
+    right.draw(canvas)
+    left.draw(canvas)
     p.update()
     i.update()
     i2.update()
+    i3.update()
+    i4.update()
 frame = simplegui.create_frame('Game', WIDTH, HEIGHT)
 frame.set_draw_handler(draw)
 frame.set_keydown_handler(kbd.keyDown)
 frame.set_keyup_handler(kbd.keyUp)
 frame.start()
-        

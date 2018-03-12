@@ -1,53 +1,57 @@
-# main code
-# it doesn't pop up in the same canvas
-from user301_hPMHbpw1h9_0 import Vector
+#Main with tetris
+#The tetris and the game open in seperate windows though
+from user301_aNmKzZ2bht_0 import Vector
 import simplegui
 import random
-import time
-
-CANVAS_DIMS = (600, 400)
-GRAVITY = -0.5
+import time    
 WIDTH = 500
 HEIGHT = 500
-def rotAnti(self):
-    aux = self.copy()
-    self.x = -aux.y
-    self.y = aux.y 
-    return self
-def getProj(self,normal):
-    n = normal.copy()
-    return n.mult(self.dot(n))
+GRAVITY = 2
+BALL_RADUIUS = 10
+start_level = 0
+Twidth = 10
+Theight = 22
+block_size = 40
+WIDTH = 500
+HEIGHT = 500
+frame_width = 16
+frame_height = 22
+#scoring
+num_cleared = 0
+level = 0
+#define initial grid
+grid = [[7 for j in range(Theight)] for i in range(Twidth)]
+# define dictionary to lookup color from grid values
+color_Dict = {0:"Aqua", 1:"Orange", 2:"Blue", 3:"Purple", \
+                    4:"Red", 5:"Lime", 6:"Yellow", 7:"White", \
+                    8: "Black"}
+
+def rotateAnti(v):
+    return Vector(-v.y, v.x)
 class Tetris:
-    start_level = 0
+     
+    #Player preferences
+    global start_level 
     #setting up the gui stuff
-    Twidth = 10
-    Theight = 22
-    block_size = 20
-    WIDTH = 500
-    HEIGHT = 500
-    frame_width = 16
-    frame_height = 22
-
-    #scoring
-    num_cleared = 0
-    #define initial grid
-
-
-    # define dictionary to lookup color from grid values
-    # define helpers
+    global width 
+    global height 
+    global block_size 
+    global WIDTH 
+    global HEIGHT 
+    global frame_width 
+    global frame_height
+    global num_cleared
+    global level
+    global grid 
+    global color_Dict 
+    
 def draw_block(c,pos,color):
-        """ draws a block with position pos on the canvas c """
-        c.draw_polygon([[pos[0],pos[1]],[pos[0]+20, \
-                        pos[1]],[pos[0]+20, \
-                        pos[1]+20],[pos[0], \
-                        pos[1]+20]],1,"White",color)
-
-    # define callbacks
+        c.draw_polygon([[pos[0],pos[1]],[pos[0]+block_size, \
+                        pos[1]],[pos[0]+block_size, \
+                        pos[1]+block_size],[pos[0], \
+                        pos[1]+block_size]],1,"White",color)
 
 def draw(c):
-        """ callback for draw handler, draw blocks represented \
-             by grid """
-
         global frame_height
         global block_size
         global pos_list
@@ -55,16 +59,15 @@ def draw(c):
         global score
         global level
         global start_level
-        global Twidth
-        grid = [[7 for j in range(22)] for i in range(10)]
-        color_Dict = {0:"Aqua", 1:"Orange", 2:"Blue", 3:"Purple", \
-                    4:"Red", 5:"Lime", 6:"Yellow", 7:"White", \
-                    8: "Black"}
+        global width
+        next_piece_offset = [(Twidth-2)*block_size, \
+                            (2)*block_size]
+        #print next_piece_offset
 
-        next_piece_offset = [(10-2)*20, (2)*20]
-        for i in range(10):
-            for j in range(22):
-                draw_block(c,[i*20,j*20], color_Dict[grid[i][j]])
+        for i in range(Twidth):
+            for j in range(Theight):
+                draw_block(c,[i*block_size,j*block_size], \
+                            color_Dict[grid[i][j]])
 
 
 class Blocks:
@@ -120,7 +123,7 @@ def check_fall():
         global pos_list
         for pos in pos_list.piece:#seeing if the piece 
                                     #needs to stop
-            if pos[1] == 22-1: #seperate to avoid indexing
+            if pos[1] == Theight-1: #seperate to avoid indexing
                                     #errors in the elif
                 fall = False
                 break
@@ -145,8 +148,6 @@ def my_update():
         global score
         global level
         global start_level
-        
-        grid = [[7 for j in range(22)] for i in range(10)]
 
         lines_bonus = {0:0, 1:40, 2:100, 3:300, 4:1200}
 
@@ -193,7 +194,7 @@ def check_line():
         global grid
         #populating the list
         remove_lines = []
-        for i in range(22):
+        for i in range(Theight):
             remove_lines.append(i)  
         tmp = grid
         for row_idx in range(len(tmp[0])):
@@ -225,62 +226,73 @@ f.set_canvas_background("White")
 f.set_draw_handler(draw)
 
     # create and start timer for block motion
-t = simplegui.create_timer(1000.0/(0+1), \
+t = simplegui.create_timer(1000.0/(start_level+level+1), \
                                         my_update)
 t.start()
 
 f.start()
 
-
 class Player:
-    def __init__(self, pos, radius=10):
+    def __init__(self, pos, vel):
+        self.pos = pos
+        self.vel = vel
+        self.radius = BALL_RADUIUS 
+        
+    def draw(self, canvas):
         self.pos = pos
         self.vel = Vector()
-        self.radius = max(radius, 10)
+        self.radius = max(radius, BALL_RADUIUS)
         self.colour = 'White'
         self.graivty = GRAVITY
 
     def draw(self, canvas):
-        if(self.pos.x - self.radius>(WIDTH-50)):
-            self.pos.x = (WIDTH-30)-self.radius
-            canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')
-        elif(self.pos.x + self.radius <(50)):
-            self.pos.x = 30 +self.radius
-            canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')    
-        if(self.pos.y - self.radius > WIDTH-50):
-            self.pos.y = (WIDTH-30)-self.radius
-            canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')    
-        elif(self.pos.y + self.radius <(0)):
-            self.pos.y = WIDTH + self.radius
-            canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')
+        #if(self.pos.x - self.radius>(WIDTH-50)):
+         #   self.pos.x = (WIDTH-30)-self.radius
+          #  canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')  
+        #if(self.pos.x + self.radius <(50)):
+        #    self.pos.x = 30 +self.radius
+         #   canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')    
+        #if(self.pos.y - self.radius > WIDTH-50):
+         #   self.pos.y = (WIDTH-30)-self.radius
+        #    canvas.draw_circle(self.pos.getP(),BALL_RADUIUS , BALL_RADUIUS, 'White', 'White')    
+       # if(self.pos.y  < 50):
+       #     self.pos.y = 60
+       #     canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')
 
-        canvas.draw_circle(self.pos.getP(), 30, 10, 'White', 'White')
+       canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')
 
+        
+    def bounce(self, normal):
+        self.vel.reflect(normal)
+        
     def update(self):
         self.pos.add(self.vel)
         self.vel.multiply(0.85)
-    
+        self.wrap()
 
-class Platform:
-    def __init__(self,point1,point2):
+    def wrap(self):
+        self.pos.x %= WIDTH
+        self.pos.y %= HEIGHT
+
+class Line:
+    def __init__(self, point1, point2):
         self.pA = point1
-        self.pB = point2 
-        #computing the normal line 
-        #self.unit = self.pB.copy().sub(self.pA).normalise()
-        #normal = self.unit.copy().rotAnti()
+        self.pB = point2
+        self.thickness = 3
+        self.unit = (self.pB - self.pA).normalize()
+        self.normal = rotateAnti(self.unit)
         
-    
-    def distanceVector(self,pos):
-        posToA = pos.copy().sub(self.pA)
-        return posToA.getProj(self.normal)
-    
-    def distance(self,player):
-        return self.distanceVector(player).length()
+    def draw(self, canvas):
+        canvas.draw_line(self.pA.getP(), self.pB.getP(), self.thickness, "White")
         
-    
-        
-        
-        
+    def distanceTo(self, pos):
+        posToA = pos - self.pA
+        proj = posToA.dot(self.normal) * self.normal
+        return proj.length()
+
+    def covers(self, pos):
+        return ((pos - self.pA).dot(self.unit) >= 0 and
+                (pos - self.pB).dot(-self.unit) >= 0)
 class Keyboard:
     def __init__(self):
         self.right = False
@@ -322,40 +334,55 @@ class Keyboard:
             self.space = False
             
 class Interaction:
-    def __init__(self, ball, keyboard, block):
-        self.ball = ball
+    def __init__(self, player,keyboard, line):
+        self.player = player
         self.keyboard = keyboard
-        self.block = block
+        self.line = line
+        self.inCollision = False
 
     def update(self):
         if self.keyboard.right:
-            self.ball.vel.add(Vector(1, 0))
+             self.player.vel.add(Vector(1, 0))
         if self.keyboard.left:
-            self.ball.vel.add(Vector(-1, 0))
+            self.player.vel.add(Vector(-1, 0))
         if self.keyboard.up:
-            self.ball.vel.add(Vector(0,-1))
+            self.player.vel.add(Vector(0,0))
         if self.keyboard.space:
-            self.ball.vel.add(Vector(0,-2))
-            print(self.ball.pos.y)
+            self.player.vel.add(Vector(0,-0.5))
         else:
-                self.ball.pos.y+=GRAVITY
-       
-
+            self.inCollision = False 
+            self.player.vel.add(Vector(0,0.5))
+        if (self.line.distanceTo(self.player.pos) < self.line.thickness + self.player.radius and
+            self.line.covers(self.player.pos)):
+            if not self.inCollision:
+                self.player.bounce(self.line.normal)
+                self.inCollision = True
+        else:
+            self.inCollision = False
 
 kbd = Keyboard()
-player = Player(Vector(WIDTH/2, HEIGHT-40))
-inter = Interaction(player, kbd, Platform)
-platform = Platform(Vector(100,100),Vector(200,200))
-              
-            
+p = Player(Vector(0,0),Vector(0,0))
+#top
+top = Line(Vector(0, 0),Vector(500,0))
+bottom= Line(Vector(0, WIDTH),Vector(500,500))
+right = Line(Vector(500, 0),Vector(500,500))
+left= Line(Vector(0, 0),Vector(0,500))
+i = Interaction(p,kbd, top)
+i2 = Interaction(p,kbd, bottom)
+i3 = Interaction(p,kbd, right)
+i4 = Interaction(p,kbd, left)
 def draw(canvas):
-    inter.update()
-    player.update()
-    player.draw(canvas) 
-
-    
-frame = simplegui.create_frame('Interactions', WIDTH, HEIGHT)
-frame.set_canvas_background('#2C6A6A')
+    p.draw(canvas)
+    top.draw(canvas)
+    bottom.draw(canvas)
+    right.draw(canvas)
+    left.draw(canvas)
+    p.update()
+    i.update()
+    i2.update()
+    i3.update()
+    i4.update()
+frame = simplegui.create_frame('Game', WIDTH, HEIGHT)
 frame.set_draw_handler(draw)
 frame.set_keydown_handler(kbd.keyDown)
 frame.set_keyup_handler(kbd.keyUp)

@@ -1,6 +1,5 @@
 #Main with tetris
-#The tetris and the game open in seperate windows though
-from user301_aNmKzZ2bht_0 import Vector
+from user301_dZJL5znAdk_0 import Vector
 import simplegui
 import random
 import time    
@@ -12,10 +11,14 @@ start_level = 0
 Twidth = 10
 Theight = 22
 block_size = 40
-WIDTH = 500
-HEIGHT = 500
-frame_width = 16
-frame_height = 22
+BACKGROUND = simplegui.load_image('http://www.cs.rhul.ac.uk/courses/CS1830/sprites/background_clouds.png')
+BACKGROUND_CENTRE = (BACKGROUND.get_width()/2, BACKGROUND.get_height()/2)
+BACKGROUND_DIMS = (BACKGROUND.get_width(), BACKGROUND.get_height())
+backImgDestDim = (WIDTH*2, 100)
+backImgPos = Vector(WIDTH/2, 50)
+gameState = 0
+#frame_width = 16
+#frame_height = 22
 #scoring
 num_cleared = 0
 level = 0
@@ -23,11 +26,76 @@ level = 0
 grid = [[7 for j in range(Theight)] for i in range(Twidth)]
 # define dictionary to lookup color from grid values
 color_Dict = {0:"Aqua", 1:"Orange", 2:"Blue", 3:"Purple", \
-                    4:"Red", 5:"Lime", 6:"Yellow", 7:"White", \
+                    4:"Red", 5:"Lime", 6:"Yellow", 7:"#2C6A6A", \
                     8: "Black"}
 
 def rotateAnti(v):
     return Vector(-v.y, v.x)
+
+class StartScreen:
+    def __init__(self, keyboard):
+        self.keyboard = keyboard
+        
+    def draw(self, canvas):
+        canvas.draw_text('Welcome to Game', (100, 225), 40, 'Red')
+        canvas.draw_text('Press space to start playing', (100, 275), 30, 'Red')
+    
+    def update(self):
+        global gameState      
+        gameState = 1
+        
+class GameOver:
+    def __init__(self, keyboard):
+        self.keyboard = keyboard
+        
+    def draw(self, canvas):
+        canvas.draw_text('Game Over', (150, HEIGHT/2), 40, 'Red')
+        canvas.draw_text('Press r to restart', (145, 275), 30, 'Red')
+    
+    def update(self):
+        global gameState      
+        gameState = 0
+        
+class Score:
+    def __init__(self):
+        self.pos = (20, 20)
+        self.time = 0
+    
+    def draw(self, canvas):
+        canvas.draw_text('Score: '+str(self.time), self.pos, 20, 'Red')
+        
+    def update(self):
+        global gameState
+        if gameState == 0:
+            self.time = 0
+            self.time += 0
+            
+        if gameState == 1:    
+            self.time += 1
+            
+        if gameState == 2:                
+            self.time += 0
+            
+class Background:
+    def __init__(self, BACKGROUND):
+        self.BACKGROUND = BACKGROUND
+        self.BACKGROUND_CENTRE = BACKGROUND_CENTRE
+        self.BACKGROUND_DIMS = BACKGROUND_DIMS
+        self.backImgDestDim = backImgDestDim
+        self.backImgPos = backImgPos
+        self.vel = Vector(-1,0)
+        
+        
+    def draw(self, canvas):
+        canvas.draw_image(BACKGROUND, BACKGROUND_CENTRE, BACKGROUND_DIMS, self.backImgPos.getP(), backImgDestDim)
+                
+    def update(self):
+        self.backImgPos.add(self.vel)
+        self.wrap()
+
+    def wrap(self):
+        self.backImgPos.x %= WIDTH 
+
 class Tetris:
      
     #Player preferences
@@ -38,8 +106,8 @@ class Tetris:
     global block_size 
     global WIDTH 
     global HEIGHT 
-    global frame_width 
-    global frame_height
+    #global frame_width 
+    #global frame_height
     global num_cleared
     global level
     global grid 
@@ -49,26 +117,8 @@ def draw_block(c,pos,color):
         c.draw_polygon([[pos[0],pos[1]],[pos[0]+block_size, \
                         pos[1]],[pos[0]+block_size, \
                         pos[1]+block_size],[pos[0], \
-                        pos[1]+block_size]],1,"White",color)
-
-def draw(c):
-        global frame_height
-        global block_size
-        global pos_list
-        global num_cleared
-        global score
-        global level
-        global start_level
-        global width
-        next_piece_offset = [(Twidth-2)*block_size, \
-                            (2)*block_size]
-        #print next_piece_offset
-
-        for i in range(Twidth):
-            for j in range(Theight):
-                draw_block(c,[i*block_size,j*block_size], \
-                            color_Dict[grid[i][j]])
-
+                        pos[1]+block_size]],1,"Black",color)
+        
 
 class Blocks:
 
@@ -219,47 +269,23 @@ def clear_lines(remove_lines):
 pos_list = Blocks()
 pos_list.create_piece()
 
-f = simplegui.create_frame("Tetris Background",\
-                                WIDTH, \
-                                HEIGHT, 200)
-f.set_canvas_background("White")
-f.set_draw_handler(draw)
 
     # create and start timer for block motion
 t = simplegui.create_timer(1000.0/(start_level+level+1), \
                                         my_update)
 t.start()
 
-f.start()
+
 
 class Player:
     def __init__(self, pos, vel):
         self.pos = pos
-        self.vel = vel
-        self.radius = BALL_RADUIUS 
-        
-    def draw(self, canvas):
-        self.pos = pos
         self.vel = Vector()
-        self.radius = max(radius, BALL_RADUIUS)
-        self.colour = 'White'
-        self.graivty = GRAVITY
+        self.radius = BALL_RADUIUS
+    
 
     def draw(self, canvas):
-        #if(self.pos.x - self.radius>(WIDTH-50)):
-         #   self.pos.x = (WIDTH-30)-self.radius
-          #  canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')  
-        #if(self.pos.x + self.radius <(50)):
-        #    self.pos.x = 30 +self.radius
-         #   canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')    
-        #if(self.pos.y - self.radius > WIDTH-50):
-         #   self.pos.y = (WIDTH-30)-self.radius
-        #    canvas.draw_circle(self.pos.getP(),BALL_RADUIUS , BALL_RADUIUS, 'White', 'White')    
-       # if(self.pos.y  < 50):
-       #     self.pos.y = 60
-       #     canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')
-
-       canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'White', 'White')
+        canvas.draw_circle(self.pos.getP(), BALL_RADUIUS, BALL_RADUIUS, 'Black', 'Black')
 
         
     def bounce(self, normal):
@@ -283,7 +309,7 @@ class Line:
         self.normal = rotateAnti(self.unit)
         
     def draw(self, canvas):
-        canvas.draw_line(self.pA.getP(), self.pB.getP(), self.thickness, "White")
+        canvas.draw_line(self.pA.getP(), self.pB.getP(), self.thickness, "#2C6A6A")
         
     def distanceTo(self, pos):
         posToA = pos - self.pA
@@ -293,12 +319,16 @@ class Line:
     def covers(self, pos):
         return ((pos - self.pA).dot(self.unit) >= 0 and
                 (pos - self.pB).dot(-self.unit) >= 0)
+    
 class Keyboard:
     def __init__(self):
         self.right = False
         self.left = False
         self.up = False
         self.space = False
+        self.k = False
+        self.r = False
+        
 
     def keyDown(self, key):
         if (key == simplegui.KEY_MAP['right']):
@@ -318,8 +348,14 @@ class Keyboard:
             self.up = True
 
         elif key == simplegui.KEY_MAP['space']:
-                self.space = True
-
+            self.space = True
+                
+        elif key == simplegui.KEY_MAP['k']:
+            self.k = True
+        
+        elif key == simplegui.KEY_MAP['r']:
+            self.r = True
+            
     def keyUp(self, key):
         if key == simplegui.KEY_MAP['right']:
             self.right = False
@@ -333,6 +369,12 @@ class Keyboard:
         elif key == simplegui.KEY_MAP['space']:
             self.space = False
             
+        elif key == simplegui.KEY_MAP['k']:
+            self.k = False
+       
+        elif key == simplegui.KEY_MAP['r']:
+            self.r = False
+            
 class Interaction:
     def __init__(self, player,keyboard, line):
         self.player = player
@@ -341,6 +383,9 @@ class Interaction:
         self.inCollision = False
 
     def update(self):
+        global gameState
+        if self.keyboard.k:
+            gameState = 2
         if self.keyboard.right:
              self.player.vel.add(Vector(1, 0))
         if self.keyboard.left:
@@ -348,7 +393,7 @@ class Interaction:
         if self.keyboard.up:
             self.player.vel.add(Vector(0,0))
         if self.keyboard.space:
-            self.player.vel.add(Vector(0,-0.5))
+            self.player.vel.add(Vector(0,-0.5))        
         else:
             self.inCollision = False 
             self.player.vel.add(Vector(0,0.5))
@@ -362,26 +407,65 @@ class Interaction:
 
 kbd = Keyboard()
 p = Player(Vector(0,0),Vector(0,0))
-#top
+s = StartScreen(kbd)
+g = GameOver(kbd)
+B = Background(BACKGROUND)
+Sc = Score()
 top = Line(Vector(0, 0),Vector(500,0))
 bottom= Line(Vector(0, WIDTH),Vector(500,500))
 right = Line(Vector(500, 0),Vector(500,500))
 left= Line(Vector(0, 0),Vector(0,500))
-i = Interaction(p,kbd, top)
+i1 = Interaction(p,kbd, top)
 i2 = Interaction(p,kbd, bottom)
 i3 = Interaction(p,kbd, right)
 i4 = Interaction(p,kbd, left)
 def draw(canvas):
-    p.draw(canvas)
-    top.draw(canvas)
-    bottom.draw(canvas)
-    right.draw(canvas)
-    left.draw(canvas)
-    p.update()
-    i.update()
-    i2.update()
-    i3.update()
-    i4.update()
+    Sc.update()
+    if gameState == 0:
+        frame.set_canvas_background('black')
+        s.draw(canvas)
+        if kbd.space:
+            s.update()
+    
+    if gameState == 1:
+        #global frame_height 
+        global block_size
+        global pos_list
+        global num_cleared
+        global score
+        global level
+        global start_level
+        global width
+        frame.set_canvas_background('#2C6A6A')
+        
+        next_piece_offset = [(Twidth-2)*block_size, \
+                                    (2)*block_size]
+        #print next_piece_offset
+        for i in range(Twidth):
+            for j in range(Theight):
+                draw_block(canvas,[i*block_size,j*block_size], \
+                                color_Dict[grid[i][j]])
+        B.draw(canvas)
+        Sc.draw(canvas)
+        p.draw(canvas)
+        top.draw(canvas)
+        bottom.draw(canvas)
+        right.draw(canvas)
+        left.draw(canvas)
+        B.update()        
+        p.update()
+        i1.update()
+        i2.update()
+        i3.update()
+        i4.update()
+        
+    if gameState == 2:
+        frame.set_canvas_background('black')
+        g.draw(canvas)
+        Sc.draw(canvas)        
+        if kbd.r:
+            g.update()
+            
 frame = simplegui.create_frame('Game', WIDTH, HEIGHT)
 frame.set_draw_handler(draw)
 frame.set_keydown_handler(kbd.keyDown)

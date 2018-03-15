@@ -138,7 +138,7 @@ class Interaction:
             self.inCollision = False
 
 kbd = Keyboard()
-p = Player(Vector(0,0),Vector(0,0))
+p = Player(Vector(100,100),Vector(0,0))
 #top
 top = Line(Vector(0, 0),Vector(500,0))
 bottom= Line(Vector(0, WIDTH),Vector(500,500))

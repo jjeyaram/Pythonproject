@@ -1,19 +1,26 @@
 #Main with tetris
 from user301_dZJL5znAdk_0 import Vector
 import simplegui, random, time, math
+#Frame Dimensions
 WIDTH = 500
 HEIGHT = 500
 GRAVITY = 2
 METEOR_RADUIUS = 10
 BACKGROUND = simplegui.load_image('http://www.cs.rhul.ac.uk/courses/CS1830/sprites/background_clouds.png')
-IMGMETEOR = simplegui.load_image('http://personal.rhul.ac.uk/zeac/098/meteor-clipart-meteoroid-20.png')
-IMGSHIP = simplegui.load_image('http://personal.rhul.ac.uk/zeac/098/images.png')
+#Meteor
+IMAGE_METEOR = simplegui.load_image('http://personal.rhul.ac.uk/zeac/098/meteor-clipart-meteoroid-20.png')
+#Ship
+IMAGE_SHIP = simplegui.load_image('http://personal.rhul.ac.uk/zeac/098/images.png')
+#Background
 BACKGROUND_CENTRE = (BACKGROUND.get_width()/2, BACKGROUND.get_height()/2)
 BACKGROUND_DIMS = (BACKGROUND.get_width(), BACKGROUND.get_height())
-IMGM_CENTRE = (IMGMETEOR.get_width()/2, IMGMETEOR.get_height()/2)
-IMGM_DIMS = (IMGMETEOR.get_width(), IMGMETEOR.get_height())
-IMGS_CENTRE = (IMGSHIP.get_width()/2, IMGSHIP.get_height()/2)
-IMGS_DIMS = (IMGSHIP.get_width(), IMGSHIP.get_height())
+#METEOR dimensions
+IMAGE_M_CENTRE = (IMAGE_METEOR.get_width()/2, IMAGE_METEOR.get_height()/2)
+IMAGE_M_DIMS = (IMAGE_METEOR.get_width(), IMAGE_METEOR.get_height())
+#SHIP dimensions
+IMAGE_S_CENTRE = (IMAGE_SHIP.get_width()/2, IMAGE_SHIP.get_height()/2)
+IMAGE_S_DIMS = (IMAGE_SHIP.get_width(), IMAGE_SHIP.get_height())
+#Background dimensions
 BACKGROUND_IMAGE_DIMENSIONS = (WIDTH*2, 100)
 BACKGROUND_IMAGE_POSITION = Vector(WIDTH/2, 50)
 #Checks if game is running
@@ -28,8 +35,8 @@ class StartScreen:
         
     def draw(self, canvas):
         canvas.draw_text('Welcome to Tamarillo', (100, 225), 40, 'Red')
-        canvas.draw_text('Press space to start playing', (100, 275), 30, 'Red')
-        canvas.draw_text('Press h to learn the controls', (100, 325), 30, 'Red')
+        canvas.draw_text('Press SPACE to start playing', (100, 275), 30, 'Red')
+        canvas.draw_text('Press H to learn the controls', (100, 325), 30, 'Red')
         self.update()
         
     def update(self):
@@ -39,14 +46,14 @@ class StartScreen:
         if (self.keyboard.h == True):  
             GAME_STATE = 3
         
-#When the player loses        
+#When the player is hit by the meteor        
 class GameOver:
     def __init__(self, keyboard):
         self.keyboard = keyboard
         
     def draw(self, canvas):
         canvas.draw_text('Game Over', (150, HEIGHT/2), 40, 'Red')
-        canvas.draw_text('Press r to restart', (145, 300), 30, 'Red')
+        canvas.draw_text('Press R to restart', (145, 300), 30, 'Red')
         self.update()
     
     def update(self):
@@ -61,12 +68,12 @@ class Help:
         
     def draw(self, canvas):
         canvas.draw_text('Help:', (0, 50), 40, 'Red')
-        canvas.draw_text('Use the left and right arrow keys to', (0, 100), 30, 'Red')
+        canvas.draw_text('Use the LEFT and RIGHT arrow keys to', (0, 100), 30, 'Red')
         canvas.draw_text('control the ship', (0, 125), 30, 'Red')
         canvas.draw_text('Press and hold the space bar to make the', (0, 175), 30, 'Red')
         canvas.draw_text('ship fly', (0, 200), 30, 'Red')
         canvas.draw_text('Avoid all the meteors', (0, 250), 30, 'Red')
-        canvas.draw_text('Press space to start the game', (100, 300), 30, 'Green')
+        canvas.draw_text('Press SPACE to start the game', (100, 300), 30, 'Green')
         self.update()
     
     def update(self):
@@ -95,7 +102,7 @@ class Score:
         if GAME_STATE == 2:                
             self.time += 0
             
-#backgroung image      
+#background image      
 class Background:
     def __init__(self, BACKGROUND):
         self.BACKGROUND = BACKGROUND
@@ -117,7 +124,7 @@ class Background:
         if self.outX():
             self.BACKGROUND_IMAGE_POSITION.x %= WIDTH
             self.BACKGROUND_IMAGE_POSITION.x -= 2 * math.copysign(BACKGROUND.get_width()/2, self.vel.x)
-        
+#Player        
 class Player:
     #player position and attributes
     def __init__(self, IMG, pos, vel):
@@ -127,7 +134,7 @@ class Player:
     
     #drawing the player
     def draw(self, canvas):
-        canvas.draw_image(IMGSHIP, IMGS_CENTRE, IMGS_DIMS, self.pos.getP(), (70,40))
+        canvas.draw_image(IMAGE_SHIP, IMAGE_S_CENTRE, IMAGE_S_DIMS, self.pos.getP(), (70,40))
         self.update()
         
     #when the player hits the borders    
@@ -157,7 +164,7 @@ class Enemy:
     
 #meteors appearing
     def draw(self, canvas):        
-        canvas.draw_image(IMGMETEOR, IMGM_CENTRE, IMGM_DIMS, self.pos.getP(), (40,40), self.imgRot)        
+        canvas.draw_image(IMAGE_METEOR, IMAGE_M_CENTRE, IMAGE_M_DIMS, self.pos.getP(), (40,40), self.imgRot)        
         self.update()
         
       
@@ -294,15 +301,15 @@ class EnemyInteraction:
                 GAME_STATE = 2
 
 kbd = Keyboard()
-p = Player(IMGSHIP, Vector(WIDTH/2, 400),Vector(0,0))
-e = Enemy(IMGMETEOR, Vector(WIDTH/2, 50))
-e2 = Enemy(IMGMETEOR, Vector(WIDTH/2, 50))
-e3 = Enemy(IMGMETEOR, Vector(WIDTH/2, 50))
-e4 = Enemy(IMGMETEOR, Vector(WIDTH/2, 50))
-e5 = Enemy(IMGMETEOR, Vector(WIDTH/2, 50))
-e6 = Enemy(IMGMETEOR, Vector(WIDTH/2, 50))
-e7 = Enemy(IMGMETEOR, Vector(WIDTH/2, 50))
-e8 = Enemy(IMGMETEOR, Vector(WIDTH/2, 50))
+p = Player(IMAGE_SHIP, Vector(WIDTH/2, 400),Vector(0,0))
+e = Enemy(IMAGE_METEOR, Vector(WIDTH/2, 50))
+e2 = Enemy(IMAGE_METEOR, Vector(WIDTH/2, 50))
+e3 = Enemy(IMAGE_METEOR, Vector(WIDTH/2, 50))
+e4 = Enemy(IMAGE_METEOR, Vector(WIDTH/2, 50))
+e5 = Enemy(IMAGE_METEOR, Vector(WIDTH/2, 50))
+e6 = Enemy(IMAGE_METEOR, Vector(WIDTH/2, 50))
+e7 = Enemy(IMAGE_METEOR, Vector(WIDTH/2, 50))
+e8 = Enemy(IMAGE_METEOR, Vector(WIDTH/2, 50))
 s = StartScreen(kbd)
 g = GameOver(kbd)
 B = Background(BACKGROUND)

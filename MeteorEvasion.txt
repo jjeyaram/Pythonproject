@@ -16,7 +16,7 @@ IMGS_CENTRE = (IMGSHIP.get_width()/2, IMGSHIP.get_height()/2)
 IMGS_DIMS = (IMGSHIP.get_width(), IMGSHIP.get_height())
 BACKGROUND_IMAGE_DIMENSIONS = (WIDTH*2, 100)
 BACKGROUND_IMAGE_POSITION = Vector(WIDTH/2, 50)
-#cHECKS if game is running
+#Checks if game is running
 GAME_STATE = 0
 #Reflects
 def rotateAnti(v):
@@ -29,10 +29,16 @@ class StartScreen:
     def draw(self, canvas):
         canvas.draw_text('Welcome to Tamarillo', (100, 225), 40, 'Red')
         canvas.draw_text('Press space to start playing', (100, 275), 30, 'Red')
+        canvas.draw_text('Press h to learn the controls', (100, 325), 30, 'Red')
+        self.update()
         
     def update(self):
-        global GAME_STATE     
-        GAME_STATE = 1
+        global GAME_STATE
+        if (self.keyboard.space == True):  
+            GAME_STATE = 1
+        if (self.keyboard.h == True):  
+            GAME_STATE = 3
+        
 #When the player loses        
 class GameOver:
     def __init__(self, keyboard):
@@ -40,11 +46,34 @@ class GameOver:
         
     def draw(self, canvas):
         canvas.draw_text('Game Over', (150, HEIGHT/2), 40, 'Red')
-        canvas.draw_text('Press r to restart', (145, 275), 30, 'Red')
+        canvas.draw_text('Press r to restart', (145, 300), 30, 'Red')
+        self.update()
+    
+    def update(self):
+        global GAME_STATE 
+        if self.keyboard.r == True:
+            GAME_STATE = 0
+            
+#Displays the games controls        
+class Help:
+    def __init__(self, keyboard):
+        self.keyboard = keyboard
+        
+    def draw(self, canvas):
+        canvas.draw_text('Help:', (0, 50), 40, 'Red')
+        canvas.draw_text('Use the left and right arrow keys to', (0, 100), 30, 'Red')
+        canvas.draw_text('control the ship', (0, 125), 30, 'Red')
+        canvas.draw_text('Press and hold the space bar to make the', (0, 175), 30, 'Red')
+        canvas.draw_text('ship fly', (0, 200), 30, 'Red')
+        canvas.draw_text('Avoid all the meteors', (0, 250), 30, 'Red')
+        canvas.draw_text('Press space to start the game', (100, 300), 30, 'Green')
+        self.update()
     
     def update(self):
         global GAME_STATE      
-        GAME_STATE = 0
+        if self.keyboard.space == True:
+            GAME_STATE = 1
+        
 #Score the player achieves        
 class Score:
     def __init__(self):
@@ -65,6 +94,7 @@ class Score:
                                         
         if GAME_STATE == 2:                
             self.time += 0
+            
 #backgroung image      
 class Background:
     def __init__(self, BACKGROUND):
@@ -77,7 +107,7 @@ class Background:
                 
     def draw(self, canvas):
         canvas.draw_image(BACKGROUND, BACKGROUND_CENTRE, BACKGROUND_DIMS, self.BACKGROUND_IMAGE_POSITION.getP(), BACKGROUND_IMAGE_DIMENSIONS)
-                        
+        self.update()               
     def outX(self):
         return (self.BACKGROUND_IMAGE_POSITION.x - BACKGROUND.get_width()/2 < 0 or
                 self.BACKGROUND_IMAGE_POSITION.x + BACKGROUND.get_width()/2 > WIDTH)
@@ -173,6 +203,7 @@ class Keyboard:
         self.space = False
         self.k = False
         self.r = False
+        self.h = False
         
 #When keys are pressed
     def keyDown(self, key):
@@ -196,6 +227,9 @@ class Keyboard:
         
         elif key == simplegui.KEY_MAP['r']:
             self.r = True
+            
+        elif key == simplegui.KEY_MAP['h']:
+            self.h = True    
 #When keys are not pressed            
     def keyUp(self, key):
         if key == simplegui.KEY_MAP['right']:
@@ -212,6 +246,9 @@ class Keyboard:
        
         elif key == simplegui.KEY_MAP['r']:
             self.r = False
+        
+        elif key == simplegui.KEY_MAP['h']:
+            self.h = False
 #When theres a collision between the ship and the meteors            
 class Interaction:
     def __init__(self, player, keyboard, line):
@@ -269,7 +306,7 @@ e8 = Enemy(IMGMETEOR, Vector(WIDTH/2, 50))
 s = StartScreen(kbd)
 g = GameOver(kbd)
 B = Background(BACKGROUND)
-
+H = Help(kbd)
 Sc = Score()
 top = Line(Vector(0, 0),Vector(500,0))
 bottom= Line(Vector(0, WIDTH),Vector(500,500))
@@ -302,9 +339,7 @@ def draw(canvas):
     if GAME_STATE == 0:
         frame.set_canvas_background('black')
         s.draw(canvas)
-        if kbd.space:
-            s.update()
-    
+            
     if GAME_STATE == 1:
         frame.set_canvas_background('#2C6A6A')
         B.draw(canvas)
@@ -322,9 +357,7 @@ def draw(canvas):
         top.draw(canvas)
         bottom.draw(canvas)
         right.draw(canvas)
-        left.draw(canvas)
-        B.update()        
-              
+        left.draw(canvas)                
         i1.update()
         i2.update()
         i3.update()
@@ -342,8 +375,13 @@ def draw(canvas):
         frame.set_canvas_background('black')
         g.draw(canvas)
         Sc.draw(canvas)        
+        
+            
+    if GAME_STATE == 3:
+        frame.set_canvas_background('black')
+        H.draw(canvas)
         if kbd.r:
-            g.update()
+            H.update()
 #creating game frame            
 frame = simplegui.create_frame('Game', WIDTH, HEIGHT)
 frame.set_draw_handler(draw)

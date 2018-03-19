@@ -16,6 +16,11 @@ start_level = 0
 Twidth = 9
 Theight = 50
 block_size = 20
+EXPLOSION_CENTER = [50, 50]
+EXPLOSION_SIZE = [100, 100]
+EXPLOSION_DIM = [9, 9]
+explosion_image = simplegui.load_image("http://commondatastorage.googleapis.com/codeskulptor-assets/explosion.hasgraphics.png")
+time= 0 
 BACKGROUND = simplegui.load_image('http://www.cs.rhul.ac.uk/courses/CS1830/sprites/background_clouds.png')
 BACKGROUND_CENTRE = (BACKGROUND.get_width()/2, BACKGROUND.get_height()/2)
 BACKGROUND_DIMS = (BACKGROUND.get_width(), BACKGROUND.get_height())
@@ -294,7 +299,7 @@ class Player:
     def draw(self, canvas):
         if LookingLeft:
             canvas.draw_image(imageLeft,self.pos.getP(), image_size, [80, 120], image_size, 0)
-            print(self.pos.getP())
+            
         else:
             canvas.draw_image(imageRight,[40,60], image_size, [80, 120], image_size, 0)
             
@@ -449,6 +454,7 @@ def draw(canvas):
         global level
         global start_level
         global width
+        global time
         frame.set_canvas_background('#2C6A6A')
         
         next_piece_offset = [(Twidth-2)*block_size, \
@@ -458,7 +464,13 @@ def draw(canvas):
             for j in range(Theight):
                 draw_grid(canvas,[i*block_size,j*block_size], \
                                 color_Dict[grid[i][j]])
-        
+       
+        explosion_index = [time % EXPLOSION_DIM[0], (time // EXPLOSION_DIM[0]) % EXPLOSION_DIM[1]]
+        canvas.draw_image(explosion_image, 
+                        [EXPLOSION_CENTER[0] + explosion_index[0] * EXPLOSION_SIZE[0], 
+                         EXPLOSION_CENTER[1] + explosion_index[1] * EXPLOSION_SIZE[1]], 
+                         EXPLOSION_SIZE, EXPLOSION_CENTER, EXPLOSION_SIZE)
+        time += 1
         B.draw(canvas)
         Sc.draw(canvas)
         p.draw(canvas)

@@ -1,11 +1,10 @@
 #Main with tetris
 from user301_dZJL5znAdk_0 import Vector
 import simplegui, random, time, math
-
 WIDTH = 500
 HEIGHT = 500
 GRAVITY = 2
-BALL_RADUIUS = 10
+METEOR_RADUIUS = 10
 BACKGROUND = simplegui.load_image('http://www.cs.rhul.ac.uk/courses/CS1830/sprites/background_clouds.png')
 IMGMETEOR = simplegui.load_image('http://personal.rhul.ac.uk/zeac/098/meteor-clipart-meteoroid-20.png')
 IMGSHIP = simplegui.load_image('http://personal.rhul.ac.uk/zeac/098/images.png')
@@ -15,25 +14,26 @@ IMGM_CENTRE = (IMGMETEOR.get_width()/2, IMGMETEOR.get_height()/2)
 IMGM_DIMS = (IMGMETEOR.get_width(), IMGMETEOR.get_height())
 IMGS_CENTRE = (IMGSHIP.get_width()/2, IMGSHIP.get_height()/2)
 IMGS_DIMS = (IMGSHIP.get_width(), IMGSHIP.get_height())
-backImgDestDim = (WIDTH*2, 100)
-backImgPos = Vector(WIDTH/2, 50)
-gameState = 0
-
+BACKGROUND_IMAGE_DIMENSIONS = (WIDTH*2, 100)
+BACKGROUND_IMAGE_POSITION = Vector(WIDTH/2, 50)
+#cHECKS if game is running
+GAME_STATE = 0
+#Reflects
 def rotateAnti(v):
     return Vector(-v.y, v.x)
-
+#Start Screen
 class StartScreen:
     def __init__(self, keyboard):
         self.keyboard = keyboard
         
     def draw(self, canvas):
-        canvas.draw_text('Welcome to Game', (100, 225), 40, 'Red')
+        canvas.draw_text('Welcome to Tamarillo', (100, 225), 40, 'Red')
         canvas.draw_text('Press space to start playing', (100, 275), 30, 'Red')
-    
-    def update(self):
-        global gameState      
-        gameState = 1
         
+    def update(self):
+        global GAME_STATE     
+        GAME_STATE = 1
+#When the player loses        
 class GameOver:
     def __init__(self, keyboard):
         self.keyboard = keyboard
@@ -43,10 +43,9 @@ class GameOver:
         canvas.draw_text('Press r to restart', (145, 275), 30, 'Red')
     
     def update(self):
-        
-        global gameState      
-        gameState = 0
-        
+        global GAME_STATE      
+        GAME_STATE = 0
+#Score the player achieves        
 class Score:
     def __init__(self):
         self.pos = (20, 20)
@@ -56,62 +55,61 @@ class Score:
         canvas.draw_text('Score: '+str(self.time), self.pos, 20, 'Red')
         
     def update(self):
-        global gameState
-        if gameState == 0:
+        global GAME_STATE
+        if GAME_STATE == 0:
             self.time = 0
             self.time += 0
             
-        if gameState == 1:    
+        if GAME_STATE == 1:    
             self.time += 1            
-            
-                            
-        if gameState == 2:                
+                                        
+        if GAME_STATE == 2:                
             self.time += 0
-            
+#backgroung image      
 class Background:
     def __init__(self, BACKGROUND):
         self.BACKGROUND = BACKGROUND
         self.BACKGROUND_CENTRE = BACKGROUND_CENTRE
         self.BACKGROUND_DIMS = BACKGROUND_DIMS
-        self.backImgDestDim = backImgDestDim
-        self.backImgPos = backImgPos
+        self.BACKGROUND_IMAGE_DIMENSIONS = BACKGROUND_IMAGE_DIMENSIONS
+        self.BACKGROUND_IMAGE_POSITION = BACKGROUND_IMAGE_POSITION
         self.vel = Vector(-1,0)
-        
-        
+                
     def draw(self, canvas):
-        canvas.draw_image(BACKGROUND, BACKGROUND_CENTRE, BACKGROUND_DIMS, self.backImgPos.getP(), backImgDestDim)
+        canvas.draw_image(BACKGROUND, BACKGROUND_CENTRE, BACKGROUND_DIMS, self.BACKGROUND_IMAGE_POSITION.getP(), BACKGROUND_IMAGE_DIMENSIONS)
                         
     def outX(self):
-        return (self.backImgPos.x - BACKGROUND.get_width()/2 < 0 or
-                self.backImgPos.x + BACKGROUND.get_width()/2 > WIDTH)
+        return (self.BACKGROUND_IMAGE_POSITION.x - BACKGROUND.get_width()/2 < 0 or
+                self.BACKGROUND_IMAGE_POSITION.x + BACKGROUND.get_width()/2 > WIDTH)
 
     def update(self):
-        self.backImgPos.add(self.vel)
+        self.BACKGROUND_IMAGE_POSITION.add(self.vel)
         if self.outX():
-            self.backImgPos.x %= WIDTH
-            self.backImgPos.x -= 2 * math.copysign(BACKGROUND.get_width()/2, self.vel.x)
+            self.BACKGROUND_IMAGE_POSITION.x %= WIDTH
+            self.BACKGROUND_IMAGE_POSITION.x -= 2 * math.copysign(BACKGROUND.get_width()/2, self.vel.x)
         
 class Player:
+    #player position and attributes
     def __init__(self, IMG, pos, vel):
         self.pos = pos
         self.vel = Vector()
         self.radius = 20
     
-
+    #drawing the player
     def draw(self, canvas):
         canvas.draw_image(IMGSHIP, IMGS_CENTRE, IMGS_DIMS, self.pos.getP(), (70,40))
         self.update()
         
-        
+    #when the player hits the borders    
     def bounce(self, normal):
         self.vel.reflect(normal)
         
     def update(self):
-        global gameState
-        if gameState == 0:
+        global GAME_STATE
+        if GAME_STATE == 0:
             self.pos = Vector(WIDTH/2, 400)
             
-        if gameState == 1:
+        if GAME_STATE == 1:
             self.pos.add(self.vel)
             self.vel.multiply(0.85)
             self.wrap()
@@ -119,26 +117,26 @@ class Player:
     def wrap(self):
         self.pos.x %= WIDTH
         self.pos.y %= HEIGHT
-        
+#meteor code
 class Enemy:
     def __init__(self, IMG, pos):
         self.pos = pos
         self.vel = Vector(random.randrange(-5, 5), random.randrange(1, 5))
-        self.radius = BALL_RADUIUS
+        self.radius = METEOR_RADUIUS
         self.imgRot = 0
     
-
+#meteors appearing
     def draw(self, canvas):        
         canvas.draw_image(IMGMETEOR, IMGM_CENTRE, IMGM_DIMS, self.pos.getP(), (40,40), self.imgRot)        
         self.update()
         
       
     def update(self):
-        global gameState
-        if gameState == 0:
+        global GAME_STATE
+        if GAME_STATE == 0:
             self.vel = Vector(random.randrange(-5, 5), random.randrange(1, 5))
             self.pos = Vector(WIDTH/2, 50)
-        if gameState == 1:
+        if GAME_STATE == 1:
             self.imgRot += 0.1
             self.pos.add(self.vel)        
             self.wrap()
@@ -146,7 +144,7 @@ class Enemy:
     def wrap(self):
         self.pos.x %= WIDTH
         self.pos.y %= HEIGHT
-        
+#borders so that the ship doesn't come out of the canvas        
 class Line:
     def __init__(self, point1, point2):
         self.pA = point1
@@ -154,7 +152,7 @@ class Line:
         self.thickness = 3
         self.unit = (self.pB - self.pA).normalize()
         self.normal = rotateAnti(self.unit)
-        
+#sets the colour the same as the background        
     def draw(self, canvas):
         canvas.draw_line(self.pA.getP(), self.pB.getP(), self.thickness, "#2C6A6A")
         
@@ -176,11 +174,10 @@ class Keyboard:
         self.k = False
         self.r = False
         
-
+#When keys are pressed
     def keyDown(self, key):
         if (key == simplegui.KEY_MAP['right']):
             self.right = True
-            #special
             if (key == simplegui.KEY_MAP['left']):
                 self.left = False
                 self.right = True
@@ -191,9 +188,6 @@ class Keyboard:
                 self.right = False
                 self.left = True
 
-        elif key == simplegui.KEY_MAP['z']:
-            self.up = True
-
         elif key == simplegui.KEY_MAP['space']:
             self.space = True
                 
@@ -202,16 +196,13 @@ class Keyboard:
         
         elif key == simplegui.KEY_MAP['r']:
             self.r = True
-            
+#When keys are not pressed            
     def keyUp(self, key):
         if key == simplegui.KEY_MAP['right']:
             self.right = False
 
         elif key == simplegui.KEY_MAP['left']:
             self.left = False
-
-        elif key == simplegui.KEY_MAP['z']:
-            self.up = False
 
         elif key == simplegui.KEY_MAP['space']:
             self.space = False
@@ -221,7 +212,7 @@ class Keyboard:
        
         elif key == simplegui.KEY_MAP['r']:
             self.r = False
-            
+#When theres a collision between the ship and the meteors            
 class Interaction:
     def __init__(self, player, keyboard, line):
         self.player = player
@@ -230,9 +221,9 @@ class Interaction:
         self.inCollision = False
 
     def update(self):
-        global gameState
+        global GAME_STATE
         if self.keyboard.k:
-            gameState = 2
+            GAME_STATE = 2
         if self.keyboard.right:
              self.player.vel.add(Vector(1, 0))
         if self.keyboard.left:
@@ -259,14 +250,12 @@ class EnemyInteraction:
         self.inCollision = False       
     
     def update(self):
-        global gameState
+        global GAME_STATE
         distance = self.player.pos.copy().subtract(self.enemies.pos).length()
         if not self.inCollision:
             if (distance < self.enemies.radius + self.player.radius):
-                gameState = 2
+                GAME_STATE = 2
 
-
-    
 kbd = Keyboard()
 p = Player(IMGSHIP, Vector(WIDTH/2, 400),Vector(0,0))
 e = Enemy(IMGMETEOR, Vector(WIDTH/2, 50))
@@ -310,13 +299,13 @@ def draw(canvas):
     e7.update()
     e8.update()
     
-    if gameState == 0:
+    if GAME_STATE == 0:
         frame.set_canvas_background('black')
         s.draw(canvas)
         if kbd.space:
             s.update()
     
-    if gameState == 1:
+    if GAME_STATE == 1:
         frame.set_canvas_background('#2C6A6A')
         B.draw(canvas)
         Sc.draw(canvas)
@@ -349,13 +338,13 @@ def draw(canvas):
         EnIn7.update()
         EnIn8.update()
         
-    if gameState == 2:
+    if GAME_STATE == 2:
         frame.set_canvas_background('black')
         g.draw(canvas)
         Sc.draw(canvas)        
         if kbd.r:
             g.update()
-            
+#creating game frame            
 frame = simplegui.create_frame('Game', WIDTH, HEIGHT)
 frame.set_draw_handler(draw)
 frame.set_keydown_handler(kbd.keyDown)

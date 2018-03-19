@@ -5,11 +5,6 @@ import random
 import time    
 WIDTH = 500
 HEIGHT = 500
-LookingLeft= True
-imageLeft = simplegui.load_image("https://github.com/jjeyaram/Pythonproject/blob/master/spriteLeft.png?raw=true")
-imageRight = simplegui.load_image("https://github.com/jjeyaram/Pythonproject/blob/master/spriteRight.png?raw=true")
-image_size= [80,120]
-image_center = [40,60]
 GRAVITY = 2
 BALL_RADIUS = 20
 start_level = 0
@@ -297,11 +292,8 @@ class Player:
         self.radius = BALL_RADIUS
   
     def draw(self, canvas):
-        if LookingLeft:
-            canvas.draw_image(imageLeft,self.pos.getP(), image_size, [80, 120], image_size, 0)
+        canvas.draw_circle(self.pos.getP(), BALL_RADIUS, BALL_RADIUS, "Black","Black")
             
-        else:
-            canvas.draw_image(imageRight,[40,60], image_size, [80, 120], image_size, 0)
             
     def bounce(self, normal):
         self.vel.reflect(normal)
